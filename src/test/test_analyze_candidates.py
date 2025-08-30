@@ -60,47 +60,49 @@ def pick_best_candidate(candidates, members, sim):
     # print("Scores: " + str(scores))
     return candidates[int(np.argmax(scores))]
 
-def build_single_table(df, archetype_col, sim, splits, lotp):
-    # print("Splits", splits)
-    for k in splits:
-        local = {k: splits[k].copy() for k in splits}
-    # print("Local", local)
+def build_single_table(df, archetype_col, sim, splits, lotp, selected_st=None, selected_fc=None):
+    local = {k: splits[k].copy() for k in splits}
     used = set([lotp])
     members = [lotp]
-    
-    for _ in range(2):
-        cands = [i for i in local['St'] if i not in used]
-        #print("Cands: ", cands)
-        if not cands:
-            cands = [i for i in local['FC'] if i not in used]
-            bucket = 'FC'
-        else:
-            bucket = 'St'
-        scores = [np.mean([sim[i, m] for m in members]) for i in cands ]
-        pick_index = int(np.argmax(scores))
-        #pick = cands[int(np.argmax(scores))]
-        pick = cands[pick_index]
-        pick_score = scores[pick_index]
-        print(f"Pick: {pick}, Similarity Score: {pick_score*100:.1f}%")
-        members.append(pick)
-        used.add(pick)
-        local[bucket].remove(pick)
-        print(members)
 
+    # Add Storyteller (use selected_st if provided)
     for _ in range(2):
-        cands = [i for i in local['QO'] if i not in used]
-        if not cands:
-            cands = [i for i in local['FC'] if i not in used]
-            bucket = 'FC'
+        if selected_st and selected_st not in used:
+            pick = selected_st
+            bucket = 'St'
         else:
-            bucket = 'QO'
-        scores = [np.mean([sim[i, m] for m in members]) for i in cands]
-        pick_index = int(np.argmax(scores))
-        pick = cands[pick_index]
+            cands = [i for i in local['St'] if i not in used]
+            if not cands:
+                cands = [i for i in local['FC'] if i not in used]
+                bucket = 'FC'
+            else:
+                bucket = 'St'
+            scores = [np.mean([sim[i, m] for m in members]) for i in cands]
+            pick_index = int(np.argmax(scores))
+            pick = cands[pick_index]
         members.append(pick)
         used.add(pick)
         local[bucket].remove(pick)
-        print(members)
+
+    # Add Food Critic (use selected_fc if provided)
+    for _ in range(2):
+        if selected_fc and selected_fc not in used:
+            pick = selected_fc
+            bucket = 'FC'
+        else:
+            cands = [i for i in local['FC'] if i not in used]
+            if not cands:
+                cands = [i for i in local['QO'] if i not in used]
+                bucket = 'QO'
+            else:
+                bucket = 'FC'
+            scores = [np.mean([sim[i, m] for m in members]) for i in cands]
+            pick_index = int(np.argmax(scores))
+            pick = cands[pick_index]
+        members.append(pick)
+        used.add(pick)
+        local[bucket].remove(pick)
+
     return members
 
 

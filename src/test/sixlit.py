@@ -26,6 +26,7 @@ if uploaded_file:
     sim = compute_similarity(survey_responses_text)
     splits = split_by_archetype(df, 'Archetype')
 
+    # Step 1: Pick LoP
     if splits['LoP']:
         lotp_options = [(idx, df.loc[idx]['Name']) for idx in splits['LoP']]
         lotp_idx = st.selectbox(
@@ -36,7 +37,42 @@ if uploaded_file:
         lotp = lotp_idx[0]
         st.write("Building table starting with:", df.loc[lotp]['Name'])
 
-        selected_indices = build_single_table(df, 'Archetype', sim, splits, lotp)
+        # Step 2: Show compatible candidates for each role and let user refine
+        # Example for Storyteller
+        compatible_storytellers = sorted(
+            [(idx, sim[lotp][idx]) for idx in splits['St'] if idx != lotp],
+            key=lambda x: x[1], reverse=True
+        )
+        st_options = [(idx, df.loc[idx]['Name']) for idx, score in compatible_storytellers[:5]]
+        selected_st_idx = st.selectbox(
+            "Choose Storyteller",
+            options=st_options,
+            format_func=lambda x: x[1]
+        )
+        selected_st = selected_st_idx[0]
+
+        # Example for Food Critic
+        compatible_fc = sorted(
+            [(idx, sim[lotp][idx]) for idx in splits['FC'] if idx != lotp],
+            key=lambda x: x[1], reverse=True
+        )
+        fc_options = [(idx, df.loc[idx]['Name']) for idx, score in compatible_fc[:5]]
+        selected_fc_idx = st.selectbox(
+            "Choose Food Critic",
+            options=fc_options,
+            format_func=lambda x: x[1]
+        )
+        selected_fc = selected_fc_idx[0]
+
+        # You can repeat for other archetypes as needed
+
+        # Step 3: Build table with user choices
+        # You need to update build_single_table to accept selected_st and selected_fc
+        selected_indices = build_single_table(
+            df, 'Archetype', sim, splits, lotp,
+            selected_st=selected_st,
+            selected_fc=selected_fc
+        )
 
         st.subheader("Dinner Table Arrangement")
         num = len(selected_indices)
@@ -80,7 +116,7 @@ if uploaded_file:
         <div class="table-circle">
         """
 
-        # 🪑 Central anchor
+        # Central anchor
         cards_html += """
         <div style="
             position: absolute;
