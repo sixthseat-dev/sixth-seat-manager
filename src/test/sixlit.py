@@ -76,40 +76,40 @@ if uploaded_file:
 
         st.subheader("Dinner Table Arrangement")
         num = len(selected_indices)
-        radius = 180
-        center_x, center_y = 250, 250
+        radius = 200
+        center_x, center_y = 350, 350
 
         cards_html = """
         <style>
         .table-circle {
             position: relative;
-            width: 500px;
-            height: 500px;
-            margin: 40px auto;
+            width: 700px;
+            height: 700px;
+            margin: 0 auto;
             background: #f5f5f5;
             border-radius: 50%;
             box-shadow: 0 2px 12px #0001;
         }
         .candidate-card-circle {
             position: absolute;
-            width: 140px;
-            height: 140px;
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 2px 12px #0001;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #fff 80%, #FFEED6 100%);
+            border-radius: 22px;
+            box-shadow: 0 4px 18px #1612d322;;
             text-align: center;
             font-family: 'Times New Roman', Times, serif;
             letter-spacing: -0.074em;
-            border: 1.5px solid #1612d3;
-            padding: 12px 4px;
+            border: 2px solid #1612d3;
+            padding: 18px 8px;
             transform: translate(-50%, -50%);
             overflow: hidden;
             z-index: 2;
             transition: transform 0.2s ease;
         }
         .candidate-card-circle:hover {
-            transform: translate(-50%, -50%) scale(1.05);
-            box-shadow: 0 4px 16px #0002;
+            transform: translate(-50%, -50%) scale(1.07);
+            box-shadow: 0 8px 24px #1612d344;
             cursor: pointer;
         }
         </style>
@@ -117,11 +117,11 @@ if uploaded_file:
         """
 
         # Central anchor
-        cards_html += """
+        cards_html += f"""
         <div style="
             position: absolute;
-            left: 250px;
-            top: 250px;
+            left: {center_x}px;
+            top: {center_y}px;
             transform: translate(-50%, -50%);
             background: #1612d3;
             color: #FFEED6;
@@ -152,13 +152,17 @@ if uploaded_file:
                 <img src="{avatar_url}" width="60" style="border-radius:50%;margin-bottom:0.5rem;"/>
                 <div style="
                     position: absolute;
-                    bottom: 6px;
-                    right: 6px;
+                    bottom: 10px;
+                    right: 10px;
                     background: #1612d3;
                     color: #FFEED6;
-                    font-size: 0.75rem;
-                    padding: 4px 8px;
-                    border-radius: 12px;
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                    padding: 6px 14px;
+                    border-radius: 16px;
+                    box-shadow: 0 2px 8px #1612d355;
+                    font-family: 'Times New Roman', Times, serif;
+                    letter-spacing: -0.074em;
                 ">
                     {score}%
                 </div>
@@ -166,4 +170,4 @@ if uploaded_file:
             """
 
         cards_html += "</div>"
-        components.html(cards_html, height=600)
+        components.html(cards_html, height=700)
